@@ -266,7 +266,6 @@ if __name__ == "__main__":  # noqa: C901
             offline_model.use_sde = False
             # break the logger...
             # offline_model.replay_buffer = model.replay_buffer
-
             for i in range(n_iterations):
                 dataset = to_mdp_dataset(model.replay_buffer)
                 offline_model.fit(dataset.episodes, n_epochs=n_epochs, save_metrics=False)

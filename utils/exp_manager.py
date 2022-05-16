@@ -18,6 +18,11 @@ from optuna.samplers import BaseSampler, RandomSampler, TPESampler
 from optuna.visualization import plot_optimization_history, plot_param_importances
 from sb3_contrib.common.vec_env import AsyncEval
 
+from stable_baselines3.common.monitor import Monitor
+from stable_baselines3.common.vec_env import VecVideoRecorder
+import wandb
+from wandb.integration.sb3 import WandbCallback
+
 # For using HER with GoalEnv
 from stable_baselines3 import HerReplayBuffer  # noqa: F401
 from stable_baselines3.common.base_class import BaseAlgorithm
@@ -155,6 +160,20 @@ class ExperimentManager(object):
         )
         self.params_path = f"{self.save_path}/{self.env_id}"
 
+        config = {
+            "policy_type": "MlpPolicy",
+            "total_timesteps": self.n_timesteps,
+            "env_name": env_id,
+        }
+
+        self.run = wandb.init(
+            project="donkeyrl",
+            config=config,
+            sync_tensorboard=True,  # auto-upload sb3's tensorboard metrics
+            monitor_gym=True,  # auto-upload the videos of agents playing the game
+            save_code=False,  # optional
+        )
+
     def setup_experiment(self) -> Optional[BaseAlgorithm]:
         """
         Read hyperparameters, pre-process them (create schedules, wrappers, callbacks, action noise objects)
@@ -171,7 +190,10 @@ class ExperimentManager(object):
         # Create env to have access to action space for action noise
         n_envs = 1 if self.algo == "ars" else self.n_envs
         env = self.create_envs(n_envs, no_log=False)
-
+        env = Monitor( env )
+        env = VecVideoRecorder( env, f"videos/{self.run.id}", record_video_trigger=lambda x: x % 1000 == 0, video_length=200)
+        env.reset()
+        
         self._hyperparams = self._preprocess_action_noise(hyperparams, saved_hyperparams, env)
 
         if self.continue_training:
@@ -209,7 +231,11 @@ class ExperimentManager(object):
             )
 
         try:
-            model.learn(self.n_timesteps, **kwargs)
+            model.learn(self.n_timesteps, callback=WandbCallback(
+                gradient_save_freq=100,
+                model_save_path=f"models/{self.run.id}",
+                verbose=2 ),
+            ) #**kwargs)
         except (KeyboardInterrupt, zmq.error.ZMQError):
             # this allows to save the model when interrupting training
             pass

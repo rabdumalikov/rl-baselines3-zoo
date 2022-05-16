@@ -1,13 +1,14 @@
 ## Custom envs
-donkey-generated-track-v0:
+#donkey-generated-roads-v0:
+donkey-minimonaco-track-v0:
   # Normalize AE (+ the rest)
   # TODO: try normalizing reward too
   normalize: "{'norm_obs': True, 'norm_reward': False}"
   env_wrapper:
     - gym.wrappers.time_limit.TimeLimit:
-        max_episode_steps: 10000
-    - utils.wrappers.HistoryWrapper:
-        horizon: 2
+        max_episode_steps: 20000
+    - ae.wrapper.AutoencoderWrapper:
+        ae_path: '/Users/v/Documents/DonkeyRL/aae-train-donkeycar/ae-128-hpc.pkl'
     # - utils.wrappers.ResidualExpertWrapper:
     #     model_path: ./logs/human/donkey-generated-track-v0_2/policy.pt
     #     d3rlpy_model: True
@@ -26,7 +27,7 @@ donkey-generated-track-v0:
   policy: 'MlpPolicy'
   learning_rate: !!float 7.3e-4
   #learning_rate: !!float 3e-4
-  buffer_size: 200000
+  buffer_size: 400000
   batch_size: 256
   ent_coef: 'auto'
   gamma: 0.99

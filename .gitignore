@@ -1,5 +1,7 @@
 __pycache__/
-logs
+models/
+videos/
+wandb/
 .pytest_cache/
 .coverage
 .coverage.*
