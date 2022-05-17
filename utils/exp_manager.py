@@ -167,7 +167,8 @@ class ExperimentManager(object):
         }
 
         self.run = wandb.init(
-            project="donkeyrl",
+            project="RL-Donkey",
+            entity="donkeycar-rl",
             config=config,
             sync_tensorboard=True,  # auto-upload sb3's tensorboard metrics
             monitor_gym=True,  # auto-upload the videos of agents playing the game
@@ -191,7 +192,7 @@ class ExperimentManager(object):
         n_envs = 1 if self.algo == "ars" else self.n_envs
         env = self.create_envs(n_envs, no_log=False)
         env = Monitor( env )
-        env = VecVideoRecorder( env, f"videos/{self.run.id}", record_video_trigger=lambda x: x % 1000 == 0, video_length=200)
+        env = VecVideoRecorder( env, f"videos/{self.run.id}", record_video_trigger=lambda x: x % 1000 == 0, video_length=2000)
         env.reset()
         
         self._hyperparams = self._preprocess_action_noise(hyperparams, saved_hyperparams, env)

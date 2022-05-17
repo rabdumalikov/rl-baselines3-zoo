@@ -8,7 +8,7 @@ donkey-minimonaco-track-v0:
     - gym.wrappers.time_limit.TimeLimit:
         max_episode_steps: 20000
     - ae.wrapper.AutoencoderWrapper:
-        ae_path: '/Users/v/Documents/DonkeyRL/aae-train-donkeycar/ae-128-hpc.pkl'
+        ae_path: '/home/donkeysim/Desktop/donkeysim/ae-64-hpc.pkl'
     # - utils.wrappers.ResidualExpertWrapper:
     #     model_path: ./logs/human/donkey-generated-track-v0_2/policy.pt
     #     d3rlpy_model: True
@@ -25,17 +25,17 @@ donkey-minimonaco-track-v0:
   #   - utils.wrappers.VecForceResetWrapper
   n_timesteps: !!float 2e6
   policy: 'MlpPolicy'
-  learning_rate: !!float 7.3e-4
+  learning_rate: !!float 7.3e-2
   #learning_rate: !!float 3e-4
-  buffer_size: 400000
-  batch_size: 256
+  buffer_size: 800000
+  batch_size: 1024
   ent_coef: 'auto'
   gamma: 0.99
   tau: 0.02
   # train_freq: [1, "episode"]
   train_freq: 200
   # gradient_steps: -1
-  gradient_steps: 256
+  gradient_steps: 128
   learning_starts: 5000
   use_sde_at_warmup: True
   use_sde: True
