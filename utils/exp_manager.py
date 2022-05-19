@@ -167,8 +167,8 @@ class ExperimentManager(object):
         }
 
         self.run = wandb.init(
-            project="RL-Donkey",
-            entity="donkeycar-rl",
+            project="donkeyrl",
+            #entity="donkeycar-rl",
             config=config,
             sync_tensorboard=True,  # auto-upload sb3's tensorboard metrics
             monitor_gym=True,  # auto-upload the videos of agents playing the game
@@ -192,8 +192,8 @@ class ExperimentManager(object):
         n_envs = 1 if self.algo == "ars" else self.n_envs
         env = self.create_envs(n_envs, no_log=False)
         env = Monitor( env )
-        env = VecVideoRecorder( env, f"videos/{self.run.id}", record_video_trigger=lambda x: x % 1000 == 0, video_length=2000)
-        env.reset()
+        env = VecVideoRecorder( env, f"videos/{self.run.id}", record_video_trigger=lambda x: x % 1000 == 0, video_length=1000)
+        #env.reset()
         
         self._hyperparams = self._preprocess_action_noise(hyperparams, saved_hyperparams, env)
 
@@ -222,6 +222,11 @@ class ExperimentManager(object):
         if self.log_interval > -1:
             kwargs = {"log_interval": self.log_interval}
 
+        self.callbacks.append( WandbCallback(
+                gradient_save_freq=100,
+                model_save_path=f"models/{self.run.id}",
+                verbose=2 ) )
+
         if len(self.callbacks) > 0:
             kwargs["callback"] = self.callbacks
 
@@ -232,11 +237,12 @@ class ExperimentManager(object):
             )
 
         try:
-            model.learn(self.n_timesteps, callback=WandbCallback(
-                gradient_save_freq=100,
-                model_save_path=f"models/{self.run.id}",
-                verbose=2 ),
-            ) #**kwargs)
+            # model.learn(self.n_timesteps, callback=WandbCallback(
+            #     gradient_save_freq=100,
+            #     model_save_path=f"models/{self.run.id}",
+            #     verbose=2, **kwargs ),
+            # )
+            model.learn(self.n_timesteps, **kwargs)
         except (KeyboardInterrupt, zmq.error.ZMQError):
             # this allows to save the model when interrupting training
             pass
