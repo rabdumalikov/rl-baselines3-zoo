@@ -12,4 +12,4 @@ donkey-minimonaco-track-v0:
         ae_path: '/Users/v/Documents/DonkeyRL/aae-train-donkeycar/ae-256-hpc.pkl'
   n_timesteps: !!float 50000
   policy: 'MlpPolicy'
-  buffer_size: 100000
+  buffer_size: 300000
