@@ -22,7 +22,7 @@ KEY_CODE_SPACE = 32
 MAX_TURN = 1
 # Smoothing constants
 STEP_THROTTLE = 0.8
-STEP_TURN = 0.8
+STEP_TURN = 0.1
 
 GREEN = (72, 205, 40)
 RED = (205, 39, 46)
@@ -65,7 +65,7 @@ def control(x, theta, control_throttle, control_steering):
         control_steering = max(target_steering, control_steering - STEP_TURN)
     else:
         control_steering = target_steering
-    return control_throttle, control_steering
+    return 0.1, control_steering
 
 
 class HumanTeleop(BaseAlgorithm):
@@ -84,8 +84,8 @@ class HumanTeleop(BaseAlgorithm):
         model_path=os.environ.get("MODEL_PATH"),
         deterministic=True,
     ):
-        super(HumanTeleop, self).__init__(
-            policy=None, env=env, policy_base=None, learning_rate=0.0, verbose=verbose, seed=seed
+        super().__init__(
+            policy=None, env=env, learning_rate=0.0, verbose=verbose, seed=seed
         )
 
         # pytype: disable=name-error
@@ -252,6 +252,7 @@ class HumanTeleop(BaseAlgorithm):
             new_obs, reward, done, infos = self.env.step(action)
 
             next_obs = new_obs
+            print( next_obs.shape )
             if done and infos[0].get("terminal_observation") is not None:
                 next_obs = infos[0]["terminal_observation"]
 
